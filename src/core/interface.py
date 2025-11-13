@@ -19,6 +19,7 @@ class Interface:
         llm = (cfg or {}).get('llm', {})
 
         api_key = llm.get('api_key') or os.getenv(llm.get('api_key_env', '')) or os.getenv('OPENAI_API_KEY')
+
         if not api_key:
             raise ValueError("LLM API key not found")
 
@@ -44,7 +45,7 @@ class Interface:
         sess = self.session or aiohttp.ClientSession()
         close_after = self.session is None
         try:
-            async with sess.post(self.api_base + "/chat/completions", headers=self.header, json=body) as resp:
+            async with sess.post(self.api_base, headers=self.header, json=body) as resp:
                 resp.raise_for_status()
                 return await resp.json()
         finally:
