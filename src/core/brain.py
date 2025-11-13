@@ -15,7 +15,7 @@ class MoralScheme:
     ):
         self.base_intentions = base_intentions
         self.n = len(base_intentions)
-        self.space_size = self.n * 2
+        self.space_size = self.n
         self.p_const = p_const
         self.r_const = r_const
 
