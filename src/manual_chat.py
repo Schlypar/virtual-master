@@ -3,6 +3,7 @@ from oai_interface import Interface
 import helper as hlp
 import aiohttp
 
+
 async def main():
     cfg = hlp.load_config()
     llm = cfg.get("llm", {})
@@ -33,4 +34,5 @@ async def main():
                 print(f"❌ Ошибка: {type(e).__name__}: {e}\n")
 
 if __name__ == "__main__":
+    asyncio.run(main())
     asyncio.run(main())

@@ -33,35 +33,18 @@ def create_logger(logger_name, log_dir, log_file):
     return logger
 
 
-class VirtualAgentPrototype:
-    def __init__(self, start_msg, model, voice):
-        self.start_msg = start_msg
-        self.model = model
-        self.voice = voice
-
-
 class VirtualTutor:
-    def __init__(self, m_id, start_msg, session, model='tts-1', voice='nova'):
+    def __init__(self, start_msg, session):
         self.client_session = session
-        self.client_id = m_id
-        now = datetime.now()
-        time_string = now.strftime("%Y-%m-%d-%H-%M-%S")
-        self.logger_dialog = create_logger(
-            f"dialog_logger_{self.client_id}",
-            f"{root}/logs_moral/{self.client_id}",
-            f"dialog_{time_string}.log"
-        )
-        self.logger_essay = create_logger(
-            f"essay_logger_{self.client_id}",
-            f"{root}/logs_moral/{self.client_id}",
-            f"essay_{time_string}.log"
-        )
+        # for possible future logging of agents conversation
+        # now = datetime.now()
+        # time_string = now.strftime("%Y-%m-%d-%H-%M-%S")
+        # self.logger_dialog = create_logger(
+        #     f"dialog_logger_{self.client_id}",
+        #     f"{root}/logs_moral/{self.client_id}",
+        #     f"dialog_{time_string}.log"
+        # )
 
-        self.logger_dialog.info("This is dialog log")
-        self.logger_essay.info("This is essay log")
-        # голос и модель для tts
-        self.model = model
-        self.voice = voice
         # список моральных схем
         self.ms_list = [BaseMoralScheme(base_intentions=hlp.first_space,
                                         session=self.client_session,
@@ -77,7 +60,7 @@ class VirtualTutor:
                                         feelings=hlp.feelings3),
                         BaseMoralScheme(base_intentions=hlp.third_space,
                                         session=self.client_session,
-                                        feelings=hlp.feelings4,)]
+                                        feelings=hlp.feelings4)]
 
         self.last_replic = ""
         self.prev_moral_id = 0
@@ -85,14 +68,6 @@ class VirtualTutor:
         self.messages = [{"role": "assistant", "content": start_msg}]
         self.schemes = [False, False, False, False]
         self.brain = [False, False, False, False]
-
-    async def generate_TTS(self, message):
-        # генерируем голос если надо
-        TTS_path = await self.ms_list[self.cur_moral_id].oai_interface.get_tts(model=self.model, voice=self.voice, input=message)
-        print(f"результат ттс generate_tts:{TTS_path}")
-        return {
-            "TTS": TTS_path
-        }
 
     def get_positive_base_intentions(self):
         dictionary = self.ms_list[self.cur_moral_id].get_base_intentions()
@@ -105,123 +80,89 @@ class VirtualTutor:
         feelings = self.ms_list[self.cur_moral_id].get_feelings()
         positive = feelings[:4]
         negative = feelings[4:]
-        print("pos: ", positive)
-        print("neg: ", negative)
 
         positive_intents = self.get_positive_base_intentions()
-        print("pints: ", positive_intents)
         result = [positive[i] - negative[i] for i in range(4)]
-        print("sultre: ", result)
         emotions = [0, 0, 0, 0, 0, 0]
         for i in range(4):
-            emotions = [emotions[j] + result[i] *
-                        hlp.feelings_to_emotions[positive_intents[i]][j] for j in range(6)]
-            print(emotions)
+            emotions = [
+                emotions[j] +
+                result[i] * hlp.feelings_to_emotions[positive_intents[i]][j]
+                for j in range(6)
+            ]
         for i in range(6):
             emotions[i] = emotions[i] * 5
             if emotions[i] < 0:
                 emotions[i] = 0
             if emotions[i] > 1:
                 emotions[i] = 1
-            print("done")
-            print(emotions)
-        print("final")
-        print(emotions)
         return emotions
 
     async def generate_answer(self, replic, TTS=False,):
-        # Выводим состояние моральных схем
-        self.logger_dialog.warning(f'Сх: {self.schemes}')
-        # Выводим состояние моральных схем
-        self.logger_dialog.warning(f'Br: {self.brain}')
+        # self.logger_dialog.warning(f'Сх: {self.schemes}')
+        # self.logger_dialog.warning(f'Br: {self.brain}')
 
         intents = self.ms_list[self.cur_moral_id].get_base_intentions()
-        self.logger_dialog.warning(f"intents: {intents}")
-        print(intents)
+        # self.logger_dialog.warning(f"intents: {intents}")
         action = await self.ms_list[self.cur_moral_id].oai_interface.get_composition(intents, replic)
         emotion = await self.ms_list[self.cur_moral_id].oai_interface.get_composition(hlp.emotion_space, replic)
 
+        # ??????? literally everytime is true
         if emotion[0] >= emotion[1]:
             emotion[1] = 0
         if emotion[1] >= emotion[0]:
             emotion[1] = 0
-        print("happy, sad, surprise, disgust, angry, afraid")
-        print(f"emotions: {emotion}")
-        self.logger_dialog.warning(f"action: {action}")
+        # print("happy, sad, surprise, disgust, angry, afraid")
+        # print(f"emotions: {emotion}")
+        # self.logger_dialog.warning(f"action: {action}")
         if action is None:
             return "Не удалось связаться с сервером"
-        self.logger_dialog.warning(action)
+        # self.logger_dialog.warning(action)
         self.ms_list[self.cur_moral_id].update_vectors(np.array(action))
 
         appr_state = self.ms_list[self.cur_moral_id].get_appraisals_state()
         feel_state = self.ms_list[self.cur_moral_id].get_feelings_state()
         dist = self.ms_list[self.cur_moral_id].euc_dist(appr_state, feel_state)
 
-        self.logger_dialog.warning(
-            f'appr:{self.ms_list[self.cur_moral_id].get_appraisals()}')
-        self.logger_dialog.warning(
-            f'feel:{self.ms_list[self.cur_moral_id].get_feelings()}')
-        self.logger_dialog.warning(
-            f'appr_state:{self.ms_list[self.cur_moral_id].get_appraisals_state()}')
-        self.logger_dialog.warning(
-            f'feel_state:{self.ms_list[self.cur_moral_id].get_feelings_state()}')
+        # self.logger_dialog.warning(
+        #     f'appr:{self.ms_list[self.cur_moral_id].get_appraisals()}')
+        # self.logger_dialog.warning(
+        #     f'feel:{self.ms_list[self.cur_moral_id].get_feelings()}')
+        # self.logger_dialog.warning(
+        #     f'appr_state:{self.ms_list[self.cur_moral_id].get_appraisals_state()}')
+        # self.logger_dialog.warning(
+        #     f'feel_state:{self.ms_list[self.cur_moral_id].get_feelings_state()}')
 
-        diff = appr_state-feel_state
+        diff = appr_state - feel_state
 
-        self.logger_dialog.warning(f'diff: {diff}')
+        # self.logger_dialog.warning(f'diff: {diff}')
 
         self.prev_moral_id = self.cur_moral_id
 
-        if self.cur_moral_id <= 2:
-            condition = await self.ms_list[self.cur_moral_id].oai_interface.get_brain_status(self.messages, replic, self.cur_moral_id)
+        condition = await self.ms_list[self.cur_moral_id].oai_interface.get_brain_status(self.messages, replic, self.cur_moral_id)
+        # self.logger_dialog.warning(f'cond: {condition}')
 
-            self.logger_dialog.warning(f'cond: {condition}')
-
-            if "да" in condition.lower():
-                self.brain[self.cur_moral_id] = True
-                self.cur_moral_id = min(self.cur_moral_id + 1, 3)
+        if "да" in condition.lower():
+            self.brain[self.cur_moral_id] = True
+            self.cur_moral_id = min(self.cur_moral_id + 1, 3)
 
         if dist < 0.25:  # проверка на превосходство крит. точки
-            # Для начала ставим статус текущей схемы в тру
             self.schemes[self.cur_moral_id] = True
+            # was commented before I even was here so why it is the way it is????????
             # self.cur_moral_id = min(self.cur_moral_id + 1, 2 ) #переходим на след схему, 3 - это число сколько всего схем
 
-        self.logger_dialog.warning(f'cur: {self.cur_moral_id}')
-        self.logger_dialog.warning(f'prev: {self.prev_moral_id}')
+        # self.logger_dialog.warning(f'cur: {self.cur_moral_id}')
+        # self.logger_dialog.warning(f'prev: {self.prev_moral_id}')
 
-        # генерируем овтет бота
         reply = await self.ms_list[self.cur_moral_id].oai_interface.get_replic(replic, self.messages, intents, diff, self.prev_moral_id, self.cur_moral_id)
-        print(reply)
-        if TTS == False:
-            # генерируем запись на доске
-            content = await self.ms_list[self.cur_moral_id].oai_interface.get_short(reply)
+        content = await self.ms_list[self.cur_moral_id].oai_interface.get_short(reply)
 
-        print("ттсчекпойнт")
-        if TTS == True:
-            print("TTS стоит как тру")
-            # генерируем голос если надо
-            TTS_path = await self.ms_list[self.cur_moral_id].oai_interface.get_tts(model=self.model, voice=self.voice, input=reply)
-            print(f"результат ттс:{TTS_path}")
-            # TTS_path = self.generate_TTS(reply)
-
-        if TTS == False:
-            print(f"short content: {content}")
         # обновляем историю диалога
         self.messages.append({"role": "user", "content": replic})
-        # обновляем историю диалога
         self.messages.append({"role": "assistant", "content": reply})
 
-        if TTS == True:
-            return {
-                "Reply": reply,
-                # "Short": content,
-                "TTS": TTS_path,
-                # "Emotions": self.feelings_to_emotions()
-                "Emotions": emotion
-            }
-        else:
-            return {
-                "Reply": reply,
-                "Short": content,
-                "Emotions": emotion
-            }
+        return {
+            "Reply": reply,
+            "Short": content,
+            "Emotions": emotion
+        }
