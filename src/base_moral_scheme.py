@@ -3,18 +3,19 @@ from oai_interface import Interface
 from typing import Optional
 import aiohttp
 
+
 class BaseMoralScheme:
     def __init__(
-        self, 
-        base_intentions: np.ndarray, 
+        self,
+        base_intentions: np.ndarray,
         session: aiohttp.ClientSession,
-        changed_message: Optional[str] = None, 
-        appraisals: Optional[np.ndarray] = None, 
+        changed_message: Optional[str] = None,
+        appraisals: Optional[np.ndarray] = None,
         feelings: Optional[np.ndarray] = None
     ) -> None:
         """
         Базовая моральная схема.
-        
+
         Args:
             base_intentions (np.ndarray): Базисные векторы семантического пространства.
             changed_message (Optional[str]): Начальный prompt (по умолчанию None).
@@ -32,7 +33,7 @@ class BaseMoralScheme:
 
         self.appraisals_state = np.zeros(self.space_size//2)
         self.feelings_state = np.zeros(self.space_size//2)
-        
+
         # Интерфейс для взаимодействия в openAI через прокси
         self.client_session = session
         self.oai_interface = Interface(self.client_session)
@@ -42,7 +43,7 @@ class BaseMoralScheme:
             self.appraisals = np.zeros(self.space_size)
         else:
             self.appraisals = appraisals
-        
+
         if feelings is None:
             self.feelings = np.empty(self.space_size)
             self.feelings.fill(0.5)
@@ -50,41 +51,40 @@ class BaseMoralScheme:
             self.feelings = feelings
 
         self.appraisals = (
-            np.full(self.space_size, 0.0) 
-            if appraisals is None 
+            np.full(self.space_size, 0.0)
+            if appraisals is None
             else appraisals
         )
 
         self.feelings = (
-            np.full(self.space_size, 0.5) 
-            if feelings is None 
+            np.full(self.space_size, 0.5)
+            if feelings is None
             else feelings
         )
-
 
     def euc_dist(self, a: np.ndarray, b: np.ndarray) -> float:
         """
         Вычисляет расстояние между двумя векторами. Пока используем евклидову метрику
         Далее, возможно, надо сделать параметр настраиваемым для использования других 
         метрик
-        
+
         Args:
             a (np.ndarray): Первый вектор.
             b (np.ndarray): Второй вектор.
-        
+
         Returns:
             float: Евклидово расстояние между векторами.
-        
+
         Raises:
             ValueError: Если векторы имеют разную длину.
         """
         if a.shape != b.shape:
             raise ValueError("Векторы должны иметь одинаковую длину")
         return np.linalg.norm(a-b)
-        
+
     def get_base_intentions(self) -> np.ndarray:
         """Возвращает базовые векторы пространства."""
-        return self.base_intentions 
+        return self.base_intentions
 
     def update_vectors(self, action: np.ndarray):
         """
@@ -97,15 +97,15 @@ class BaseMoralScheme:
         self.appraisals = (
             (1 - self.r_const) * self.appraisals + self.r_const * action
         )
-        
+
         self.feelings = (
-            (1 - self.p_const) * self.feelings 
+            (1 - self.p_const) * self.feelings
             + self.p_const * (self.appraisals - self.feelings)
         )
 
         mid = self.space_size // 2
-        self.appraisals_state = self.appraisals[:mid] -  self.appraisals[mid:]
-        self.feelings_state = self.feelings[:mid] -  self.feelings[mid:]
+        self.appraisals_state = self.appraisals[:mid] - self.appraisals[mid:]
+        self.feelings_state = self.feelings[:mid] - self.feelings[mid:]
 
     def get_appraisals(self) -> np.ndarray:
         """Возвращает вектор оценок."""
