@@ -4,8 +4,7 @@ from typing import Dict, Any
 
 
 def load_config() -> Dict[str, Any]:
-    # ищем config.yaml в корне проекта (один уровень выше папки agentsys)
-    root = pathlib.Path(__file__).parent.parent
+    root = pathlib.Path(__file__).parent.parent.parent
     conf_path = root / "config.yaml"
     if not conf_path.exists():
         return {}

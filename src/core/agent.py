@@ -55,7 +55,7 @@ class Agent(ABC):
         self.schemes_done = [False] * len(self.schemes_done)
 
     async def analyze_intentions(self, user_text: str) -> List[float]:
-        return await self.interface.get_composition(self.brain.base_intentions, user_text)
+        return await self.interface.get_composition(self.brain.current().base_intentions, user_text)
 
     async def analyze_emotions(self, user_text: str) -> List[float]:
         return await self.interface.get_composition(EMOTION_SPACE, user_text)
@@ -96,7 +96,4 @@ class Agent(ABC):
         self.messages.append({"role": "assistant", "content": reply_text})
         self.prev_scheme = self.cur_scheme
 
-        return {
-            "Reply": reply_text,
-            "Emotions": emotions,
-        }
+        return reply_text
