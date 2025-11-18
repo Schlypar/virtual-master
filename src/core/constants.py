@@ -1,30 +1,27 @@
-# core/constants.py
 import numpy as np
 from typing import Dict
 
-# маленькая адаптация — ключи остаются int->str как в вашем helper.py
 FIRST_SPACE: Dict[int, str] = {
-    1: 'любознательный', 2: 'стремящийся к обучению', 3: 'уверенный', 4: 'уважающий',
-    -1: 'безразличный', -2: 'противищайся обучению', -3: 'неуверенный', -4: 'неуважительный'
+    1: 'friendly', 2: 'receptive to opinion', 3: 'confident', 4: 'respecting',
+    -1: 'hostile', -2: 'opposing to opinion', -3: 'uncertain', -4: 'disrespecting'
 }
 
 EMOTION_SPACE: Dict[int, str] = {
     1: 'happy', 2: 'sad', 3: 'surprised', 4: 'disgust', 5: 'angry', 6: 'afraid'
 }
 
-# пример векторов по умолчанию (как в helper)
-FEELINGS1 = np.array([0.3, 0.2, 0.2, 0.5, 0.1, 0.08, 0.08, 0.2])
+FEELINGS1 = np.array([0.2, 0.1, 0.0, 0.3, 0.08, 0.05, 0.05, 0.2])
 FEELINGS2 = FEELINGS1.copy()
 FEELINGS3 = FEELINGS1.copy()
 FEELINGS4 = np.array([0.3, 0.2, 0.2, 0.1, 0.08, 0.08])
 
 FEELINGS_TO_EMOTIONS = {
-    'любознательный': [1, -1, 1, -1, -1, 0],
-    'стремящийся к обучению': [1, 0, 0, -1, -1, -1],
-    'уверенный': [1, -1, -1, -1, 1, -1],
-    'уважающий': [0, 0, 0, 0, -1, 1],
-    'внимательный': [0, 0, 1, -1, 0, 1],
-    'обнадеживающий': [1, 0, 0, 0, -1, 0],
-    'признающий': [1, -1, 0, 0, 0, 0],
-    'многословный': [1, 0, 1, -1, 0, 0],
+    'friendly': [0, -1, 1, -1, -1, -1],
+    'hostile': [-1, 0, 1, 1, 1, 1],
+    'confident': [0, 0, -1, 0, 0, -1],
+    'uncertain': [0, 0, 1, 0, 0, 1],
+    'respecting': [0, -1, 1, -1, -1, -1],
+    'disrespecting': [-1, 1, -1, 1, 1, 0],
+    'receptive to opinion': [1, -1, -1, -1, -1, 0],
+    'opposing to opinion': [-1, 1, 1, 1, 1, 0],
 }
