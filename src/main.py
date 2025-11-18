@@ -7,10 +7,9 @@ from os.path import join, dirname
 from core.interface import Interface
 from core.brain import Brain
 from core.constants import FIRST_SPACE, FEELINGS1
-from core.prompts import SANYA_ROLE
-from core.agent import Agent
+from core.prompts import EXAMPLE_ROLE
 from core.manager import AgentManager
-from example_agent import Sanya
+from example_agent import ExamleAgent
 
 
 async def main():
@@ -20,9 +19,9 @@ async def main():
             base_intentions=FIRST_SPACE,
             feelings=FEELINGS1.copy()
         )
-        agent = Sanya(
-            id="sanya",
-            role=SANYA_ROLE,
+        agent = ExamleAgent(
+            id="example",
+            role=EXAMPLE_ROLE,
             brain=brain,
             interface=interface
         )
@@ -31,17 +30,16 @@ async def main():
         mgr.add_agent(agent)
 
         while True:
-            user_input = input("👤 Вы: ")
+            user_input = input("You: ")
             if user_input.lower() in {"exit", "quit"}:
-                print("👋 Завершение сессии.")
+                print("Exiting session.")
                 break
 
-            print("⏳ Отправка запроса модели...")
             try:
-                response = await mgr.send_to_agent("sanya", user_input)
-                print(f"\n🤖 {agent.id}\n", response.strip(), "\n")
+                response = await mgr.send_to_agent("example", user_input)
+                print(f"\n{agent.id}: ", response.strip(), "\n")
             except Exception as e:
-                print(f"❌ Ошибка: {type(e).__name__}: {e}\n")
+                print(f"Error: {type(e).__name__}: {e}\n")
 
 if __name__ == "__main__":
     dotenv_path = join(dirname(__file__), '.env')

@@ -17,7 +17,8 @@ class Role:
 
     def to_string(self) -> str:
         """Reconstructs a readable prompt string similar to the original format."""
-        lines = [f"{self.name} = \"\"\""]
+        lines = []
+        # lines = [f"{self.name} = \"\"\""]
         lines.append(self.description.strip())
         lines.append("")
         lines.append("=== CORE PRINCIPLES ===")
