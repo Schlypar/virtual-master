@@ -2,7 +2,7 @@ from typing import Dict, Any, List
 from abc import abstractmethod, ABC
 from .brain import Brain
 from .interface import Interface
-from .constants import EMOTION_SPACE
+from .constants import EMOTION_SPACE, FEELINGS1
 from .role import Role
 import numpy as np
 
@@ -61,7 +61,7 @@ class Agent(ABC):
         return await self.interface.get_composition(EMOTION_SPACE, user_text)
 
     @abstractmethod
-    def generate_changed_message(self, user_text: str, intentions: str) -> str:
+    def generate_changed_message(self, user_text: str, context: Dict[str, Any]) -> str:
         pass
 
     async def generate_reply(self, user_text: str) -> Dict[str, Any]:
@@ -85,8 +85,7 @@ class Agent(ABC):
             self.cur_scheme = next_idx
 
         # 4) Формируем ответ для LLM
-        intentions = ", ".join(self.brain.current().base_intentions.values())
-        changed_message = self.generate_changed_message(user_text, intentions)
+        changed_message = self.generate_changed_message(user_text, context)
 
         messages = list(self.messages)
         messages.append({"role": "user", "content": changed_message})
