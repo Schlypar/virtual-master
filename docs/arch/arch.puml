@@ -1,0 +1,53 @@
+@startuml
+
+title Scene Workflow\n
+hide footbox
+
+participant Controller
+
+participant Master
+actor ActiveActor
+participant Director
+participant Teller
+collections Actors
+
+== init Scene ==
+Controller -> Actors : init actors
+
+Controller -> Master : load new Scene (script)
+Controller -> Director : (environment description)
+
+Master -> Teller : provide Scene intro
+Teller -> Actors : tell actors the intro
+
+== play the Scene ==
+
+loop until Scene is over
+
+Master -> Actors : select next ActiveActor
+Actors -->> Master
+Master -> ActiveActor : set actor
+
+Master -> ActiveActor : ask for Request
+
+ActiveActor -> Director : Request
+
+rnote over Director
+    * validate Request
+    * test action success
+    * Perception Check
+endnote
+
+Director -> Director : update memory
+Director -> Master : result of Request as a fact
+Director -> Teller : list of witnesses\nand result description 
+Teller -> Actors : tell specific Actors\nthe result of the Request
+
+end
+
+== Scene end ==
+
+Controller -> Master : collect Scene results
+Master -->> Controller
+
+@enduml
