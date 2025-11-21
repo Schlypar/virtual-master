@@ -30,3 +30,9 @@ def split_string(text):
 
     # If no @Name pattern is found, return the original text as the content
     return ["", text]
+
+
+def extract_names(text):
+    # Pattern to match @ followed by one or more word characters
+    pattern = r'@(\w+)'
+    return re.findall(pattern, text)

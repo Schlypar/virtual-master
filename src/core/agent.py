@@ -48,6 +48,16 @@ class Agent(ABC):
             },
         ]
 
+    def erase_last_memory(self):
+        self.messages = self.messages[:len(self.messages) - 1]
+
+    def update_memory(self, memory: List[str]):
+        for mem in memory:
+            self.messages.append({
+                "role": "user",
+                "content": f"{mem}"
+            })
+
     def reset_brain(self):
         self.reset_history_full()
         self.prev_scheme = 0

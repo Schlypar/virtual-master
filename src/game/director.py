@@ -11,9 +11,9 @@ class Spotlight:
 
 
 class Request:
-    def __init__(self, character: Character, request: str):
+    def __init__(self, character: Character, content: str):
         self.character = character
-        self.request = request
+        self.request = content
 
 
 class Director:
