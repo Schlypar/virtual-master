@@ -7,6 +7,7 @@ from characters.master_character import MCharacter, NPC
 from ..core.interface import Interface
 from .director import Director, Request, Spotlight
 from ..core.utils import extract_names
+from .dice import Dice
 
 
 class Action:
@@ -25,7 +26,7 @@ class SceneJudge(ABC):
     def __init__(self, ai: Interface):
         self.ai = ai
 
-    def judge(
+    async def judge(
             self,
             request: str,
             plot: str,
@@ -50,7 +51,7 @@ class SceneJudge(ABC):
             return (True, remarks)
         return (False, remarks)
 
-    def perception_check(
+    async def perception_check(
             self,
             request: Request,
             agents: [Character],
@@ -82,7 +83,7 @@ class SceneChanger(ABC):
         self.plot = plot
         self.ai = ai
 
-    def is_finished(self, plot: str, history: List[Dict[str, str]]) -> bool:
+    async def is_finished(self, plot: str, history: List[Dict[str, str]]) -> bool:
         messages = history.copy()
         messages.append({
             "role": "user",
@@ -124,7 +125,7 @@ class Scene(ABC):
     def get_spotlight(self, story_information: str) -> Spotlight:
         return self.director.give_directive(story_information)
 
-    def give_spotlight(self, spotlight: Spotlight) -> Action:
+    async def give_spotlight(self, spotlight: Spotlight) -> Action:
         is_player = True
         actor: Character = None
         for character in self.master_characters:
@@ -168,10 +169,31 @@ class Scene(ABC):
                 MCharacter(actor).erase_last_memory()
 
         # 3. if action must be with difficulty then calculate it and test
+        dice = Dice(self.scene_judje.ai)
+        context = {
+            "plot": self.plot,
+            "history": self.director.messages
+        }
+        check_result = await dice.resolve_action(request, actor, context)
+        
+        # Update request string based on difficulty check result
+        if check_result["requires_check"]:
+            if check_result["modified_action"]:
+                # Use the modified action from Dice if available
+                request = check_result["modified_action"]
+            elif not check_result["success"]:
+                # If check failed, modify the request to reflect failure
+                if check_result["outcome_modification"]:
+                    request = f"{request} (Failed: {check_result['outcome_modification']})"
+                else:
+                    request = f"{request} (Failed)"
+            else:
+                # If check succeeded, optionally add success indicator
+                if check_result["outcome_modification"]:
+                    request = f"{request} ({check_result['outcome_modification']})"
+        
         req = Request(actor, request)
         action = Action(req, [actor])
-        # TODO: implement logic that defines how difficulty calculated and how it is tested.
-        # For now assume that everything is a success
         # 4. Judge also must give who perceived this action after difficulty testing was done
         perceived = extract_names(self.scene_judje.perception_check(
             req,

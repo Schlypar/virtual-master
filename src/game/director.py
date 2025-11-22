@@ -42,7 +42,7 @@ class Director:
             """
         }]
 
-    def give_directive(self, story_information: str) -> Spotlight:
+    async def give_directive(self, story_information: str) -> Spotlight:
         self.messages.append({
             "role": "user",
             "content": story_information
