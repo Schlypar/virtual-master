@@ -1,12 +1,13 @@
-from core.role import Role
-from typing import Dict, Any
-from core.agent import Agent
-from core.brain import Brain
-from core.interface import Interface
-from core.constants import EMOTION_SPACE
+from typing import Dict, Union, Any
+import numpy as np
+from .core.role import Role
+from .core.agent import Agent
+from .core.brain import Brain
+from .core.interface import Interface
 
 
-class ExamleAgent(Agent):
+
+class BaseAgent(Agent):
     def __init__(self, id: str, role: Role, brain: Brain, interface: Interface):
         super().__init__(
             id,
@@ -41,3 +42,23 @@ class ExamleAgent(Agent):
                         '''
 
         return changed_message
+
+
+def new_agent(
+        id: str,
+        role: Role,
+        base_intentions: Union[Dict[int, str], Dict[int, Dict[int, str]]],
+        feelings: np.ndarray,
+        ai: Interface,
+) -> BaseAgent:
+    brain = Brain(
+        base_intentions,
+        feelings
+    )
+    agent = BaseAgent(
+        id,
+        role,
+        brain,
+        ai
+    )
+    return agent

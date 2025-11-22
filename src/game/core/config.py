@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 
 def load_config() -> Dict[str, Any]:
-    root = pathlib.Path(__file__).parent.parent.parent
+    root = pathlib.Path(__file__).parent.parent.parent.parent
     conf_path = root / "config.yaml"
     if not conf_path.exists():
         return {}

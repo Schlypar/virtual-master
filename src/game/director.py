@@ -1,7 +1,7 @@
 from typing import Dict, List
-from characters.character import Character
-from ..core.interface import Interface
-from ..core.utils import split_string
+from .characters import Character
+from .core.interface import Interface
+from .core.utils import split_string
 
 
 class Spotlight:

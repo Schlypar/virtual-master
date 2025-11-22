@@ -1,12 +1,11 @@
 from typing import Dict, Optional, List
-from abc import ABC, abstractmethod
+from abc import ABC
 
-from characters.character import Character
-from characters.player_character import PCharacter
-from characters.master_character import MCharacter, NPC
-from ..core.interface import Interface
+from .core.interface import Interface
+from .core.utils import extract_names
+
+from .characters import Character, PCharacter, MCharacter, NPC
 from .director import Director, Request, Spotlight
-from ..core.utils import extract_names
 from .dice import Dice
 
 
@@ -145,7 +144,7 @@ class Scene(ABC):
                     request = input(
                         f"{spotlight.to_character}.\nYour action: ")
                     # 1.5. validate that request with PlayerJudge first
-                    accepted, remark = self.player.judge(
+                    accepted, remark = await self.player.judge(
                         request,
                         self.director.messages
                     )
@@ -153,12 +152,12 @@ class Scene(ABC):
                         break
                     spotlight.to_character += f"\nSome remarks: {remark}"
             else:
-                request = MCharacter(actor).get_replic_to(
+                request = await MCharacter(actor).get_replic_to(
                     spotlight.to_character
                 )
 
             # 2. validate that request with SceneJudge
-            accepted, remark = self.scene_judje.judge(
+            accepted, remark = await self.scene_judje.judge(
                 request,
                 self.director.messages
             )
@@ -175,7 +174,7 @@ class Scene(ABC):
             "history": self.director.messages
         }
         check_result = await dice.resolve_action(request, actor, context)
-        
+
         # Update request string based on difficulty check result
         if check_result["requires_check"]:
             if check_result["modified_action"]:
@@ -184,18 +183,20 @@ class Scene(ABC):
             elif not check_result["success"]:
                 # If check failed, modify the request to reflect failure
                 if check_result["outcome_modification"]:
-                    request = f"{request} (Failed: {check_result['outcome_modification']})"
+                    request = f"{
+                        request} (Failed: {check_result['outcome_modification']})"
                 else:
                     request = f"{request} (Failed)"
             else:
                 # If check succeeded, optionally add success indicator
                 if check_result["outcome_modification"]:
-                    request = f"{request} ({check_result['outcome_modification']})"
-        
+                    request = f"{
+                        request} ({check_result['outcome_modification']})"
+
         req = Request(actor, request)
         action = Action(req, [actor])
         # 4. Judge also must give who perceived this action after difficulty testing was done
-        perceived = extract_names(self.scene_judje.perception_check(
+        perceived = extract_names(await self.scene_judje.perception_check(
             req,
             self.master_characters,
             self.director.messages

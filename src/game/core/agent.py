@@ -74,7 +74,7 @@ class Agent(ABC):
     def generate_changed_message(self, user_text: str, context: Dict[str, Any]) -> str:
         pass
 
-    async def generate_reply(self, user_text: str) -> Dict[str, Any]:
+    async def generate_reply(self, user_text: str) -> str:
         """Главный цикл обработки входного текста."""
 
         intents = await self.analyze_intentions(user_text)
