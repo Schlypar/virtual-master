@@ -11,8 +11,8 @@ def parse_number_list(text: str) -> List[float]:
 
 
 def split_string(text):
-    # Find the last occurrence of @Name (or any word starting with @)
-    match = re.search(r'(@\w+)(.*)', text)
+    # Find the last occurrence of @Name where Name contains ONLY English letters
+    match = re.search(r'(@[A-Za-z]+)(.*)', text)
 
     if match:
         name_part = match.group(1)  # The @Name part
@@ -28,11 +28,14 @@ def split_string(text):
         else:
             return [name_part, remaining_content]
 
-    # If no @Name pattern is found, return the original text as the content
+    # If no valid @Name pattern is found, return the original text as the content
     return ["", text]
 
 
-def extract_names(text):
-    # Pattern to match @ followed by one or more word characters
-    pattern = r'@(\w+)'
-    return re.findall(pattern, text)
+def extract_names(texts: List[str]) -> List[List[str]]:
+    """
+    Extract names from each string in the list separately.
+    Returns a list of lists, where each inner list contains names from one string.
+    """
+    pattern = r'@([A-Za-z]+)'
+    return [re.findall(pattern, text) for text in texts]

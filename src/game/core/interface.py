@@ -1,3 +1,5 @@
+# from abc import ABC, abstractmethod
+
 import aiohttp
 import os
 from typing import List, Dict, Any, Optional
@@ -18,7 +20,8 @@ class Interface:
         cfg = load_config()
         llm = (cfg or {}).get('llm', {})
 
-        api_key = llm.get('api_key') or os.getenv(llm.get('api_key_env', '')) or os.getenv('OPENAI_API_KEY')
+        api_key = llm.get('api_key') or os.getenv(
+            llm.get('api_key_env', '')) or os.getenv('OPENAI_API_KEY')
 
         if not api_key:
             raise ValueError("LLM API key not found")
@@ -30,13 +33,15 @@ class Interface:
             'openai_proxy': os.getenv('PROXY_OPENAI_URL')
         }
 
-        api_base = llm.get('api_base') or base_defaults.get( provider) or 'https://api.openai.com/v1'
+        api_base = llm.get('api_base') or base_defaults.get(
+            provider) or 'https://api.openai.com/v1'
         self.api_base = api_base.rstrip('/')
         self.header = {'Authorization': f'Bearer {
             api_key}', 'Content-Type': 'application/json'}
         self.session = session
         self.model_chat = llm.get('model_chat', 'gpt-4o-mini')
 
+    # @abstractmethod
     async def post_messages(self, messages: List[Dict[str, str]], model: Optional[str] = None) -> Dict[str, Any]:
         body = {
             "model": model or self.model_chat,
@@ -52,6 +57,7 @@ class Interface:
             if close_after:
                 await sess.close()
 
+    # @abstractmethod
     async def extract_text(self, messages: List[Dict[str, str]], model: Optional[str] = None) -> str:
         j = await self.post_messages(messages, model=model)
         try:
@@ -59,6 +65,7 @@ class Interface:
         except Exception:
             return ""
 
+    # @abstractmethod
     async def get_composition(self, intents: Dict[int, str], phrase: str, model: Optional[str] = None) -> Optional[List[float]]:
         """
         Небольшой helper, который формирует промпт для модели и парсит числа,
@@ -80,3 +87,32 @@ class Interface:
         if len(nums) < num:
             nums += [0.0]*(num-len(nums))
         return [float(x) for x in nums[:num]]
+
+
+# class InterfaceMock(ABC):
+#     """
+#     Чистая обёртка над HTTP API LLM.
+#     Методы:
+#       - post_messages -> возвращает json ответа
+#       - extract_text -> получает content из ответов
+#       - get_composition -> список вероятностей каждой интенсии
+#     """
+#
+#     def __init__(self, session: Optional[aiohttp.ClientSession] = None):
+#         pass
+#
+#     async def post_messages(self, messages: List[Dict[str, str]], model: Optional[str] = None) -> Dict[str, Any]:
+#         return {
+#             "model": model or self.model_chat,
+#             "messages": messages
+#         }
+#
+#     async def extract_text(self, messages: List[Dict[str, str]], model: Optional[str] = None) -> str:
+#         return "Test"
+#
+#     async def get_composition(self, intents: Dict[int, str], phrase: str, model: Optional[str] = None) -> Optional[List[float]]:
+#         """
+#         Небольшой helper, который формирует промпт для модели и парсит числа,
+#         но НЕ содержит логики переходов/интерпретации.
+#         """
+#         return [0.0] * 8

@@ -5,7 +5,7 @@ import os
 from os.path import join, dirname
 
 
-from game.core.interface import Interface
+from game.core.interface import Interface#, InterfaceMock
 from game.core.constants import *
 from game.core.prompts import *
 from game.core.manager import AgentManager
@@ -111,7 +111,7 @@ async def main():
             The kidnapping of the Burgermeister's daughter is your only chance. Solving it would expose the rot you discovered and clear your name. But you can't operate openly. You need someone who knows the city's underbelly without being part of it
             """,
             aspects=[],
-            ai=session,
+            ai=interface,
         )
 
         plot = Plot(
@@ -126,10 +126,10 @@ async def main():
                     general_npc=None,
                     director=Director(
                         plot=tavern_scene,
-                        ai=session
+                        ai=interface
                     ),
-                    scene_judje=SceneJudge(ai=session),
-                    scene_changer=SceneChanger(plot=tavern_scene, ai=session)
+                    scene_judje=SceneJudge(ai=interface),
+                    scene_changer=SceneChanger(plot=tavern_scene, ai=interface)
                 )
             ]
 
@@ -138,7 +138,7 @@ async def main():
         game = Game(
             plot=plot,
             player=player,
-            storyteller=Storyteller(ai=session)
+            storyteller=Storyteller(ai=interface)
         )
 
         try:

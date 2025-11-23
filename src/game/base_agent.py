@@ -26,10 +26,8 @@ class BaseAgent(Agent):
         intents = self.brain.current().base_intentions
         for i, value in enumerate(new_feelings, start=1):
             if value > -0.005:
-                print(intents[i])
                 emotions.append(intents[i])
             else:
-                print(intents[-i])
                 emotions.append(intents[-i])
 
         changed_message = f'''

@@ -51,6 +51,9 @@ class MCharacter(Character):
         """
         return await self.agent.generate_reply(message)
 
+    def erase_last_memory(self):
+        self.agent.erase_last_memory()
+
 
 class NPC(MCharacter):
     def __init__(
@@ -100,6 +103,6 @@ class PCharacter(Character):
             """
         })
         remarks = await self.ai.extract_text(messages)
-        if "yes" in remarks.to_lower() or "positive" in remarks.to_lower():
+        if "yes" in remarks.lower() or "positive" in remarks.lower():
             return (True, remarks)
         return (False, remarks)

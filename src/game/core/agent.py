@@ -49,7 +49,7 @@ class Agent(ABC):
         ]
 
     def erase_last_memory(self):
-        self.messages = self.messages[:len(self.messages) - 1]
+        self.messages = self.messages[:len(self.messages) - 3]
 
     def update_memory(self, memory: List[str]):
         for mem in memory:

@@ -9,6 +9,56 @@ from .director import Director, Request, Spotlight
 from .dice import Dice
 
 
+def draw_bordered_text(text, width):
+    """
+    Draws a border around text, breaking long lines into multiple parts.
+
+    Args:
+        text (str): The text to put in a border
+        width (int): The maximum width of each line (including borders)
+
+    Returns:
+        str: The text with border
+    """
+    if width < 5:
+        raise ValueError(
+            "Width must be at least 5 to accommodate borders and minimal text")
+
+    content_width = width - 4
+
+    words = text.split()
+    lines = []
+    current_line = []
+
+    for word in words:
+        # Check if adding this word would exceed the line length
+        if len(' '.join(current_line + [word])) <= content_width:
+            current_line.append(word)
+        else:
+            if current_line:
+                lines.append(' '.join(current_line))
+            current_line = [word]
+
+    if current_line:
+        lines.append(' '.join(current_line))
+
+    if not lines:
+        lines = [""]
+
+    top_border = "┌" + "─" * (width - 2) + "┐"
+    bottom_border = "└" + "─" * (width - 2) + "┘"
+
+    bordered_lines = [top_border]
+
+    for line in lines:
+        padded_line = line.ljust(content_width)
+        bordered_lines.append(f"│ {padded_line} │")
+
+    bordered_lines.append(bottom_border)
+
+    return '\n'.join(bordered_lines)
+
+
 class Action:
     def __init__(self, request: Request, perceived_action: [Character]):
         self.request = request
@@ -46,7 +96,7 @@ class SceneJudge(ABC):
             """
         })
         remarks = await self.ai.extract_text(messages)
-        if "yes" in remarks.to_lower() or "positive" in remarks.to_lower():
+        if "yes" in remarks.lower() or "positive" in remarks.lower():
             return (True, remarks)
         return (False, remarks)
 
@@ -55,7 +105,7 @@ class SceneJudge(ABC):
             request: Request,
             agents: [Character],
             history: Optional[List[Dict[str, str]]]
-    ) -> [Character]:
+    ) -> [str]:
         messages = []
         if history is not None:
             messages = history.copy()
@@ -74,7 +124,7 @@ class SceneJudge(ABC):
                 Here's all possible agenst: {character_names}
             """
         })
-        reply = await self.ai.extract_text(messages)
+        return await self.ai.extract_text(messages)
 
 
 class SceneChanger(ABC):
@@ -94,7 +144,7 @@ class SceneChanger(ABC):
             """
         })
         reply = await self.ai.extract_text(messages)
-        if "yes" in reply.to_lower() or "positive" in reply.to_lower():
+        if "yes" in reply.lower() or "positive" in reply.lower():
             return True
         return False
 
@@ -141,8 +191,11 @@ class Scene(ABC):
             request: str = ""
             if is_player:
                 while True:
-                    request = input(
-                        f"{spotlight.to_character}.\nYour action: ")
+                    print(draw_bordered_text(
+                        text=f"@Player: {spotlight.to_character}",
+                        width=80
+                    ))
+                    request = input("\nYour action: ")
                     # 1.5. validate that request with PlayerJudge first
                     accepted, remark = await self.player.judge(
                         request,
@@ -152,9 +205,10 @@ class Scene(ABC):
                         break
                     spotlight.to_character += f"\nSome remarks: {remark}"
             else:
-                request = await MCharacter(actor).get_replic_to(
+                request = await actor.get_replic_to(
                     spotlight.to_character
                 )
+                break
 
             # 2. validate that request with SceneJudge
             accepted, remark = await self.scene_judje.judge(
@@ -165,7 +219,7 @@ class Scene(ABC):
                 break
             spotlight.to_character += f"\nSome remarks: {remark}"
             if not is_player:
-                MCharacter(actor).erase_last_memory()
+                actor.erase_last_memory()
 
         # 3. if action must be with difficulty then calculate it and test
         dice = Dice(self.scene_judje.ai)
@@ -196,15 +250,15 @@ class Scene(ABC):
         req = Request(actor, request)
         action = Action(req, [actor])
         # 4. Judge also must give who perceived this action after difficulty testing was done
-        perceived = extract_names(await self.scene_judje.perception_check(
+        perceived = extract_names([await self.scene_judje.perception_check(
             req,
             self.master_characters,
             self.director.messages
-        ))
+        )])
         # 5. Update memory of all agents who perceived that action.
         for character in self.master_characters:
             if character.name in perceived and character in self.master_characters:
-                MCharacter(character).update_memory([action.request.request])
+                character.update_memory([action.request.content])
 
         if not is_player and "Player" in perceived:
             action.perceived_action.append(self.player)

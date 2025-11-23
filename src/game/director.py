@@ -13,7 +13,7 @@ class Spotlight:
 class Request:
     def __init__(self, character: Character, content: str):
         self.character = character
-        self.request = content
+        self.content = content
 
 
 class Director:
@@ -48,7 +48,7 @@ class Director:
             "content": story_information
         })
         reply = await self.ai.extract_text(self.messages)
-        self.messages.append(reply)
+        self.messages.append({"role": "assistant", "content": reply})
         splitted_str = split_string(reply)
         character_name = splitted_str[0][1:]
         content = splitted_str[1]

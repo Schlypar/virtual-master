@@ -1,6 +1,9 @@
+import os
+import platform
+
 from typing import List, Optional
 from .scene import Scene, Action
-from .storyteller import Storyteller
+from .storyteller import Storyteller, draw_bordered_text, create_text_grid
 from .characters import PCharacter
 
 
@@ -41,6 +44,13 @@ class Game:
         self.current_action: Optional[Action] = None
         self.current_scene_index: int = 0
 
+    def clear_screen():
+        """Clear the console screen"""
+        if platform.system().lower() == "windows":
+            os.system('cls')
+        else:
+            os.system('clear')
+
     def _get_current_scene(self) -> Optional[Scene]:
         """Get the current scene from the plot."""
         if 0 <= self.current_scene_index < len(self.plot.scenes):
@@ -58,6 +68,8 @@ class Game:
         6. Check whether the Scene has ended - if yes, move to next Scene
         """
         description = ""
+        width = 80
+        Game.clear_screen()
         while True:
             current_scene = self._get_current_scene()
             if current_scene is None:
@@ -70,6 +82,12 @@ class Game:
                 scene_info = f"Story: {self.plot.story}\nCurrent scene plot: {
                     current_scene.plot}"
                 description = await self.storyteller.describe_scene(scene_info)
+                print(draw_bordered_text(description, width))
+
+            character_names: List[str] = []
+            for char in current_scene.master_characters:
+                character_names.append("@" + char.name)
+
 
             # Step 2: Request a Spotlight from the current Scene using the description
             # Note: Scene.get_spotlight calls director.give_directive which is async,
@@ -82,6 +100,8 @@ class Game:
             # Step 4: Feed this Action into the storyteller to narrate it
             # This narration will be used as the description in the next iteration
             description = await self.storyteller.narrate_action(action)
+            print(create_text_grid(character_names, width))
+            print(draw_bordered_text(description, width))
             self.current_action = action
 
             # Step 5: Check whether the Scene has ended
