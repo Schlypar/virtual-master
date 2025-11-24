@@ -87,12 +87,31 @@ class SceneJudge(ABC):
         messages.append({
             "role": "user",
             "content": f"""
-                Based on script and history of conversation decide whether
-                given request is adequate and does not contradict the plot.
-                Write 'yes' or 'positive' if does not contradict and 'no' or 'negative' otherwise
-                If negative then write what is contradicting
-                Here's request: {request}.
-                Here's script: {plot}
+                You are evaluating a player action in a roleplaying game. Be permissive and allow creative actions that advance the story.
+                
+                Plot/Scene Script: {plot}
+                
+                Player's Action: {request}
+                
+                Your task: Only reject this action if it CLEARLY and FUNDAMENTALLY breaks the plot, scene logic, or story progression.
+                
+                ACCEPT the action if:
+                - It is a reasonable response to the current situation in the scene
+                - It allows the player to explore, investigate, or interact with the scene
+                - It moves the story forward, even if in an unexpected direction
+                - It fits the general setting and context of the scene
+                - It shows creative problem-solving within the scene's constraints
+                
+                REJECT the action ONLY if:
+                - It completely ignores or contradicts critical plot elements that must happen
+                - It would make the scene impossible to continue (e.g., killing essential NPCs without reason)
+                - It breaks fundamental scene logic (e.g., leaving a scene that hasn't started yet)
+                - It introduces elements completely incompatible with the setting
+                
+                Remember: Players should have freedom to explore and interact creatively. The plot should guide, not restrict. Allow actions that could reasonably lead to the plot's goals, even if they take unexpected paths.
+                
+                Respond with 'yes' or 'positive' to accept, 'no' or 'negative' to reject.
+                If rejecting, briefly explain what fundamental plot contradiction exists.
             """
         })
         remarks = await self.ai.extract_text(messages)
@@ -213,6 +232,7 @@ class Scene(ABC):
             # 2. validate that request with SceneJudge
             accepted, remark = await self.scene_judje.judge(
                 request,
+                self.plot,
                 self.director.messages
             )
             if accepted:

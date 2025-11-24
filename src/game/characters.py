@@ -94,12 +94,29 @@ class PCharacter(Character):
         messages.append({
             "role": "user",
             "content": f"""
-                Based on character background and history of conversation decide whether
-                given request is adequate and does not contradict the character.
-                Write 'yes' or 'positive' if does not contradict and 'no' or 'negative' otherwise.
-                If negative then write what is contradicting
-                Here's request: {request}.
-                Here's background of character: {self.background}
+                You are evaluating a player action in a roleplaying game. Be permissive and allow creative actions.
+                
+                Character Background: {self.background}
+                
+                Player's Action: {request}
+                
+                Your task: Only reject this action if it is CLEARLY and FUNDAMENTALLY incompatible with the character's core identity, background, or capabilities. 
+                
+                ACCEPT the action if:
+                - It is reasonable for the character's situation and background
+                - It shows creative problem-solving, even if not explicitly mentioned in the background
+                - It fits the character's general personality and motivations
+                - It is a natural response to the current situation
+                
+                REJECT the action ONLY if:
+                - It directly contradicts established core facts about the character (e.g., a pacifist suddenly committing murder without reason)
+                - It requires abilities or knowledge the character clearly cannot have
+                - It breaks fundamental character motivations without justification
+                
+                Be generous in interpretation. Players should have freedom to explore creative solutions.
+                
+                Respond with 'yes' or 'positive' to accept, 'no' or 'negative' to reject.
+                If rejecting, briefly explain what fundamental contradiction exists.
             """
         })
         remarks = await self.ai.extract_text(messages)
