@@ -2,6 +2,25 @@ from typing import List, Dict, Optional
 from .core.interface import Interface
 from .scene import Action
 
+from colorama import Back, Style
+
+BLACK = '\033[40m'
+RED = '\033[41m'
+GREEN = '\033[42m'
+YELLOW = '\033[43m'
+BLUE = '\033[44m'
+MAGENTA = '\033[45m'
+CYAN = '\033[46m'
+WHITE = '\033[47m'
+BRIGHT_BLACK = '\033[100m'
+BRIGHT_RED = '\033[101m'
+BRIGHT_GREEN = '\033[102m'
+BRIGHT_YELLOW = '\033[103m'
+BRIGHT_BLUE = '\033[104m'
+BRIGHT_MAGENTA = '\033[105m'
+BRIGHT_CYAN = '\033[106m'
+BRIGHT_WHITE = '\033[107m'
+
 
 class Storyteller:
     """
@@ -114,6 +133,7 @@ class Storyteller:
 
         return description
 
+
 def create_text_grid(strings: [str], width: int, padding: int = 1) -> str:
     """
     Create a text grid from an array of strings.
@@ -173,6 +193,7 @@ def create_text_grid(strings: [str], width: int, padding: int = 1) -> str:
 
     return "\n".join(grid_lines)
 
+
 def draw_bordered_text(text, width):
     """
     Draws a border around text, breaking long lines into multiple parts.
@@ -221,3 +242,7 @@ def draw_bordered_text(text, width):
     bordered_lines.append(bottom_border)
 
     return '\n'.join(bordered_lines)
+
+
+def paint_bg(text, color):
+    return f"{color}{text}{Style.RESET_ALL}"

@@ -4,6 +4,7 @@ import platform
 from typing import List, Optional
 from .scene import Scene, Action
 from .storyteller import Storyteller, draw_bordered_text, create_text_grid
+from .storyteller import RED, BLUE, GREEN, paint_bg
 from .characters import PCharacter
 
 
@@ -82,7 +83,7 @@ class Game:
                 scene_info = f"Story: {self.plot.story}\nCurrent scene plot: {
                     current_scene.plot}"
                 description = await self.storyteller.describe_scene(scene_info)
-                print(draw_bordered_text(description, width))
+                print(paint_bg(text=draw_bordered_text(description, width), color=BLUE))
 
             character_names: List[str] = []
             for char in current_scene.master_characters:
@@ -101,7 +102,10 @@ class Game:
             # This narration will be used as the description in the next iteration
             description = await self.storyteller.narrate_action(action)
             print(create_text_grid(character_names, width))
-            print(draw_bordered_text(description, width))
+            if spotlight.character_name == "Player":
+                print(paint_bg(text=draw_bordered_text(description, width), color=RED))
+            else:
+                print(paint_bg(text=draw_bordered_text(description, width), color=GREEN))
             self.current_action = action
 
             # Step 5: Check whether the Scene has ended
