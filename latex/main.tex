@@ -1,0 +1,286 @@
+\documentclass[a4paper,14pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{geometry}
+\geometry{left=3cm}
+\geometry{right=1cm}
+\geometry{top=2cm}
+\geometry{bottom=2cm}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{titlesec}
+\usepackage{indentfirst}
+\usepackage{enumitem}
+\usepackage{tocloft}
+
+% Настройка оформления разделов
+\titleformat{\section}[block]
+{\normalfont\bfseries\centering}
+{\thesection}{1em}{}
+
+\titleformat{\subsection}[block]
+{\normalfont\bfseries\raggedright}
+{\thesubsection}{1em}{}
+
+% Настройка оглавления
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+\begin{document}
+
+
+\tableofcontents
+\newpage
+
+\section*{Введение}
+\addcontentsline{toc}{section}{Введение}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Объяснение проблемы: обычные ИИ-боты в играх ведут себя непредсказуемо
+\item Зачем это нужно: чтобы создать более реалистичных и последовательных персонажей
+\item Что сделали: разработали систему, которая добавляет эмоции и память ИИ-персонажу
+\item Как проверяли: протестировали на диалогах и сравнили с обычным ботом
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item \cite{1} - примеры проблем в AI Dungeon
+\item \cite{6} - современные подходы к ИИ-ведущим
+\item \cite{9} - вызовы в диалоговых системах
+\end{itemize}
+
+\section{Анализ проблем существующих диалоговых систем}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Описание как работают текущие системы (типа AI Dungeon)
+\item Главные проблемы:
+  \begin{itemize}
+  \item Нет памяти - забывают что было раньше
+  \item Нет характера - сегодня добрый, завтра злой
+  \item Слишком всем согласны - разрешают любые безумные действия
+  \end{itemize}
+\item Примеры из литературы где эти проблемы описываются
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item \cite{1}, \cite{2}, \cite{3} - примеры систем с проблемами
+\item \cite{8} - анализ проблем в сторителлинге
+\item \cite{9} - систематизация вызовов в диалоговых системах
+\end{itemize}
+
+\section{Архитектура и алгоритмы эмоционально-когнитивного агента}
+
+\subsection{Модель личности агента: система ролей и принципов}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Как устроен класс Role - хранит описание персонажа
+\item Что такое core\_principles и guidelines - правила поведения
+\item Как это превращается в инструкцию для ИИ (prompt)
+\item Пример кода с датаклассами
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item \cite{6} - использование интенций и теории сознания
+\item \cite{12} - методы промпт-инжиниринга
+\end{itemize}
+
+\subsection{Когнитивная архитектура: обработка состояний и принятие решений}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Роль класса Brain - главный "мозг" системы
+\item Что такое MoralScheme - схемы поведения
+\item Как работает переключение между схемами
+\item Пример с TransitionRule
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item \cite{10} - теория моральных основ
+\item \cite{7} - сравнение статических и агентных подходов
+\end{itemize}
+
+\subsection{Динамическая модель эмоциональных состояний}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Математика эмоций: appraisals и feelings
+\item Формулы обновления состояний
+\item Что такое r\_const и p\_const (константы скорости изменений)
+\item Как измеряется "расстояние" между эмоциями (euc\_dist)
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item \cite{11} - когнитивная структура эмоций
+\item Marsella et al. - вычислительные модели эмоций
+\end{itemize}
+
+\subsection{Механизм взаимодействия с языковыми моделями}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Как класс Agent работает с ИИ
+\item Метод generate\_changed\_message - формирование запроса
+\item Как эмоции встраиваются в диалог
+\item Пример кода с формированием промпта
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item \cite{5} - LLM как ассистенты
+\item \cite{12} - методы промпт-инжиниринга
+\end{itemize}
+
+\section{Реализация и тестирование системы}
+
+\subsection{Технологический стек и ключевые компоненты}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Что использовали: Python, aiohttp, numpy
+\item Основные классы: ExamleAgent, Brain, MoralScheme
+\item Ключевые методы и их назначение
+\item Примеры кода из вашей реализации
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item Официальная документация Python, NumPy
+\item \cite{6}, \cite{7} - аналогичные реализации
+\end{itemize}
+
+\subsection{Методика тестирования и экспериментальные сценарии}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Как тестировали: какие диалоги использовали
+\item Что проверяли: стабильность эмоций, память, характер
+\item С чем сравнивали: работа вашего агента vs обычная LLM
+\item Метрики оценки: какие числа измеряли
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item \cite{6}, \cite{7}, \cite{8} - методики тестирования из схожих работ
+\end{itemize}
+
+\subsection{Анализ результатов и эффективности подхода}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Насколько лучше ваш агент по сравнению с базовой версией
+\item Примеры удачных и неудачных диалогов
+\item Выводы по эффективности подхода
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item Результаты собственного эксперимента
+\item Сравнение с теоретическими положениями из Главы 1
+\end{itemize}
+
+\section*{Заключение}
+\addcontentsline{toc}{section}{Заключение}
+
+\textbf{Что здесь должно быть:}
+\begin{itemize}
+\item Кратко что сделали и что получилось
+\item Главные достижения: что работает лучше
+\item Где можно использовать вашу систему
+\item Что можно улучшить в будущем
+\item Итоговый вывод: стоит ли использовать такой подход
+\end{itemize}
+
+\textbf{На какую литературу ссылаться:}
+\begin{itemize}
+\item Обобщение результатов работы
+\item Перспективы развития на основе \cite{5}, \cite{6}, \cite{7}
+\end{itemize}
+
+\newpage
+
+\begin{thebibliography}{9}
+\addcontentsline{toc}{section}{Список литературы}
+
+\bibitem{1}
+AI Dungeon. URL: \texttt{https://play.aidungeon.com/}
+
+\bibitem{2}
+AI Dungeon-Chi (ранний доступ). URL: \texttt{https://aidungeon-chi.vercel.app/}
+
+\bibitem{3}
+Dungeon Master AI. URL: \texttt{https://miniapps.ai/dungeon-master-ai/}
+
+\bibitem{4}
+HyperWrite AI – Interactive Story / Assistant Tool. URL: \texttt{https://app.hyperwriteai.com/}
+
+\bibitem{5}
+Zhu A., Martin L. J., Head A., Callison-Burch C. CALYPSO: LLMs as Dungeon Masters' Assistants. arXiv preprint, 2023. DOI: 10.48550/arXiv.2308.07540.
+
+\bibitem{6}
+Zhou P., Zhu A., Hu J., Pujara J., Ren X., Callison-Burch C., Choi Y., Ammanabrolu P. I Cast Detect Thoughts: Learning to Converse and Guide with Intents and Theory-of-Mind in Dungeons and Dragons. arXiv preprint, 2022. DOI: 10.48550/arXiv.2212.10060.
+
+\bibitem{7}
+Jørgensen N. H., Tharmabalan S., Aslan I., Hansen N. B., Merritt T. Static Vs. Agentic Game Master AI for Facilitating Solo Role-Playing Experiences. arXiv preprint, 2025. DOI: 10.48550/arXiv.2502.19519.
+
+\bibitem{8}
+Santiago J. M., Parayno R. L., Deja J. A., Samson B. P. V. Rolling the Dice: Imagining Generative AI as a Dungeons \& Dragons Storytelling Companion. arXiv preprint, 2023. DOI: 10.48550/arXiv.2304.01860.
+
+\bibitem{9}
+Callison-Burch C., Tomar G. S., Martin L. J., Ippolito D., Bailis S., Reitter D. Dungeons and Dragons as a Dialog Challenge for Artificial Intelligence. In: Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, 2022.
+
+\bibitem{10}
+Haidt J. The Righteous Mind: Why Good People Are Divided by Politics and Religion. Pantheon Books, 2012.
+
+\bibitem{11}
+Ortony A., Clore G. L., Collins A. The Cognitive Structure of Emotions. Cambridge University Press, 1988.
+
+\bibitem{12}
+Liu P., et al. Pre-train, Prompt, and Predict: A Systematic Survey of Prompting Methods in Natural Language Processing. ACM Computing Surveys, 2023.
+
+\end{thebibliography}
+
+\newpage
+
+\section*{Приложение А. Листинг ключевых компонентов системы}
+\addcontentsline{toc}{section}{Приложение А}
+
+\begin{verbatim}
+# core/agent.py - базовый класс агента
+class Agent(ABC):
+    def __init__(self, agent_id: str, role: Role, 
+                 brain: Brain, interface: Interface):
+        self.id = agent_id
+        self.role = role
+        self.brain = brain
+        self.interface = interface
+        self.messages: List[Dict[str, str]] = [
+            {"role": "system", "content": f"{self.role.to_string()}"}
+        ]
+    
+    async def generate_reply(self, user_text: str) -> Dict[str, Any]:
+        intents = await self.analyze_intentions(user_text)
+        emotions = await self.analyze_emotions(user_text)
+        self.brain.update_vectors(np.array(intents))
+        
+        context = {"last_message": user_text, 
+                  "intents": intents, "emotions": emotions}
+        
+        if self.brain.check_transition(self.cur_scheme, context):
+            self.brain.switch_to(self.cur_scheme + 1)
+            
+        changed_message = self.generate_changed_message(user_text, context)
+        messages = list(self.messages)
+        messages.append({"role": "user", "content": changed_message})
+        reply_text = await self.interface.extract_text(messages)
+        
+        return reply_text
+\end{verbatim}
+
+\end{document}
